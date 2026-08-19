@@ -17,16 +17,29 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Fetch MapLibre Vector MBTiles
-        run: |
-          mkdir -p output
-          
-          # Download vector tile MBTiles packages (OpenMapTiles schema for MapLibre)
-          curl -fL -A "Mozilla/5.0" -o output/England.mbtiles "https://r2-tiles.openfreemap.org/mbtiles/england.mbtiles" || \
-          curl -fL -A "Mozilla/5.0" -o output/England.mbtiles "https://pub-c2a4f4e7c7a346519102436d8d675688.r2.dev/england.mbtiles"
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
 
-          curl -fL -A "Mozilla/5.0" -o output/Scotland.mbtiles "https://r2-tiles.openfreemap.org/mbtiles/scotland.mbtiles" || \
-          curl -fL -A "Mozilla/5.0" -o output/Scotland.mbtiles "https://pub-c2a4f4e7c7a346519102436d8d675688.r2.dev/scotland.mbtiles"
+      - name: Build MapLibre MBTiles with Planetiler
+        run: |
+          mkdir -p output data/sources
+          
+          # Download Planetiler release
+          wget -q https://github.com/onthegomap/planetiler/releases/latest/download/planetiler.jar
+
+          # Pre-download shapefiles with curl to avoid Java header-buffer timeouts
+          curl -fL -A "Mozilla/5.0" -o data/sources/lake_centerline.shp.zip "https://github.com/acalcutt/osm-lakelines/releases/download/latest/lake_centerline.shp.zip"
+          curl -fL -A "Mozilla/5.0" -o data/sources/water-polygons-split-3857.zip "https://osmdata.openstreetmap.de/download/water-polygons-split-3857.zip"
+          curl -fL -A "Mozilla/5.0" -o data/sources/natural_earth_vector.sqlite.zip "https://naciscdn.org/naturalearth/packages/natural_earth_vector.sqlite.zip"
+
+          # Build England (Planetiler pulls fresh Geofabrik data automatically)
+          java -Xmx5g -jar planetiler.jar --download --area=england --output=output/England.mbtiles --fetch-wikidata=false
+
+          # Build Scotland
+          java -Xmx5g -jar planetiler.jar --download --area=scotland --output=output/Scotland.mbtiles --fetch-wikidata=false
 
           ls -lh output/
 
