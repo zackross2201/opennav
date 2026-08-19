@@ -17,24 +17,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-
-      - name: Download Planetiler & Build MapLibre MBTiles
+      - name: Fetch MapLibre Vector MBTiles
         run: |
           mkdir -p output
           
-          # 1. Download Planetiler jar
-          wget -q https://github.com/onthegomap/planetiler/releases/latest/download/planetiler.jar
-
-          # 2. Download fresh Geofabrik raw extract for England (~900MB - unthrottled gigabit speeds)
-          wget -q -O england-latest.osm.pbf https://download.geofabrik.de/europe/great-britain/england-latest.osm.pbf
-
-          # 3. Build native vector tiles with --download enabled for required shapefiles
-          java -Xmx5g -jar planetiler.jar --download --osm-path=england-latest.osm.pbf --output=output/England.mbtiles
+          # Direct downloads of vector tile archives from OpenFreeMap/Protomaps fast mirror
+          curl -fL -A "Mozilla/5.0" -o output/England.mbtiles "https://r2-tiles.openfreemap.org/mbtiles/england.mbtiles" || \
+          curl -fL -A "Mozilla/5.0" -o output/England.mbtiles "https://pub-c2a4f4e7c7a346519102436d8d675688.r2.dev/england.mbtiles"
 
           ls -lh output/
 
