@@ -27,14 +27,14 @@ jobs:
         run: |
           mkdir -p output
           
-          # 1. Download Planetiler tool
-          wget https://github.com/onthegomap/planetiler/releases/latest/download/planetiler.jar
+          # 1. Download Planetiler jar
+          wget -q https://github.com/onthegomap/planetiler/releases/latest/download/planetiler.jar
 
-          # 2. Download fresh Geofabrik raw OSM extract for England (~900MB)
-          wget -O england-latest.osm.pbf https://download.geofabrik.de/europe/great-britain/england-latest.osm.pbf
+          # 2. Download fresh Geofabrik raw extract for England (~900MB - unthrottled gigabit speeds)
+          wget -q -O england-latest.osm.pbf https://download.geofabrik.de/europe/great-britain/england-latest.osm.pbf
 
-          # 3. Convert OSM raw data directly to MapLibre MBTiles (takes ~2 minutes)
-          java -Xmx6g -jar planetiler.jar --osm-path=england-latest.osm.pbf --output=output/England.mbtiles
+          # 3. Build native vector tiles with --download enabled for required shapefiles
+          java -Xmx5g -jar planetiler.jar --download --osm-path=england-latest.osm.pbf --output=output/England.mbtiles
 
           ls -lh output/
 
