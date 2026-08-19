@@ -21,9 +21,12 @@ jobs:
         run: |
           mkdir -p output
           
-          # Direct downloads of vector tile archives from OpenFreeMap/Protomaps fast mirror
+          # Download vector tile MBTiles packages (OpenMapTiles schema for MapLibre)
           curl -fL -A "Mozilla/5.0" -o output/England.mbtiles "https://r2-tiles.openfreemap.org/mbtiles/england.mbtiles" || \
           curl -fL -A "Mozilla/5.0" -o output/England.mbtiles "https://pub-c2a4f4e7c7a346519102436d8d675688.r2.dev/england.mbtiles"
+
+          curl -fL -A "Mozilla/5.0" -o output/Scotland.mbtiles "https://r2-tiles.openfreemap.org/mbtiles/scotland.mbtiles" || \
+          curl -fL -A "Mozilla/5.0" -o output/Scotland.mbtiles "https://pub-c2a4f4e7c7a346519102436d8d675688.r2.dev/scotland.mbtiles"
 
           ls -lh output/
 
