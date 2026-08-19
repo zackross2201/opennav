@@ -17,15 +17,25 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Fetch Real Vector Maps
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Download Planetiler & Build MapLibre MBTiles
         run: |
           mkdir -p output
-          # Direct downloads from the verified Mapsforge UK directory
-          curl -fL -A "Mozilla/5.0" -o output/England.map "https://download.mapsforge.org/maps/v5/europe/united-kingdom/england.map"
-          curl -fL -A "Mozilla/5.0" -o output/Scotland.map "https://download.mapsforge.org/maps/v5/europe/united-kingdom/scotland.map"
-          curl -fL -A "Mozilla/5.0" -o output/Wales.map "https://download.mapsforge.org/maps/v5/europe/united-kingdom/wales.map"
+          
+          # 1. Download Planetiler tool
+          wget https://github.com/onthegomap/planetiler/releases/latest/download/planetiler.jar
 
-          # Verify downloads are valid binary maps
+          # 2. Download fresh Geofabrik raw OSM extract for England (~900MB)
+          wget -O england-latest.osm.pbf https://download.geofabrik.de/europe/great-britain/england-latest.osm.pbf
+
+          # 3. Convert OSM raw data directly to MapLibre MBTiles (takes ~2 minutes)
+          java -Xmx6g -jar planetiler.jar --osm-path=england-latest.osm.pbf --output=output/England.mbtiles
+
           ls -lh output/
 
       - name: Publish to GitHub Release
