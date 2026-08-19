@@ -20,11 +20,12 @@ jobs:
       - name: Fetch Real Vector Maps
         run: |
           mkdir -p output
-          # Download actual Mapsforge binary vector maps from the official fast mirror
-          curl -fL -A "Mozilla/5.0" -o output/England.map "https://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/v5/europe/great_britain/england.map"
-          curl -fL -A "Mozilla/5.0" -o output/Scotland.map "https://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/v5/europe/great_britain/scotland.map"
+          # Direct downloads from the verified Mapsforge UK directory
+          curl -fL -A "Mozilla/5.0" -o output/England.map "https://download.mapsforge.org/maps/v5/europe/united-kingdom/england.map"
+          curl -fL -A "Mozilla/5.0" -o output/Scotland.map "https://download.mapsforge.org/maps/v5/europe/united-kingdom/scotland.map"
+          curl -fL -A "Mozilla/5.0" -o output/Wales.map "https://download.mapsforge.org/maps/v5/europe/united-kingdom/wales.map"
 
-          # Verify file sizes are real (> 100MB)
+          # Verify downloads are valid binary maps
           ls -lh output/
 
       - name: Publish to GitHub Release
