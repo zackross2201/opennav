@@ -1,0 +1,36 @@
+name: Weekly Map Builder & Release
+
+on:
+  schedule:
+    # Runs every Sunday at midnight UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch: # Allows you to manually trigger it anytime from GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Fetch Latest Map Extracts
+        run: |
+          mkdir -p output
+          # Example: Download fresh country/region extracts
+          curl -L -o output/England.map "https://download.mapsforge.org/maps/v5/europe/england.map"
+          curl -L -o output/Scotland.map "https://download.mapsforge.org/maps/v5/europe/scotland.map"
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Weekly Map Update"
+          draft: false
+          prerelease: false
+          files: output/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
